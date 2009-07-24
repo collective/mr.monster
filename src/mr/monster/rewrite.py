@@ -38,7 +38,14 @@ class RewriteMiddleware(object):
             options['host'] = environ['SERVER_NAME']
             options['port'] = environ['SERVER_PORT']
         
-        options['PATH_INFO'] = environ['PATH_INFO']
+    
+        if "SCRIPT_NAME" in environ:
+            options['PATH_INFO'] = environ['SCRIPT_NAME']
+        else:
+            options['PATH_INFO'] = ''
+        
+        options['PATH_INFO'] += environ['PATH_INFO']
+
         
         format = "/VirtualHostBase/http/"   \
                  "%(host)s:%(port)s"        \
