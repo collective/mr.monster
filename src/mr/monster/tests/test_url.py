@@ -42,8 +42,10 @@ class test_urls(unittest.TestCase):
     def test_vhm_host_autodetect(self):
         factory = RewriteFactory({}, autodetect="true")
         r = response()
-        app = factory(PathAssertionEndpoint("/VirtualHostBase/http/www.example.com:80/VirtualHostRoot/", self))
-        app({"REQUEST_METHOD":"GET",
+        app = factory(PathAssertionEndpoint("/VirtualHostBase/http/127.0.0.1:8080/VirtualHostRoot/", self))
+        app({"SERVER_NAME":"127.0.0.1",
+             "SERVER_PORT":"8080",
+             "REQUEST_METHOD":"GET",
              "PATH_INFO":"/"}, r.start_response)
         assert r.status.startswith("200")
 
@@ -51,9 +53,7 @@ class test_urls(unittest.TestCase):
         factory = RewriteFactory({}, host="www.example.com", port="80", internalpath="/foo")
         r = response()
         app = factory(PathAssertionEndpoint("/VirtualHostBase/http/www.example.com:80/foo/VirtualHostRoot/", self))
-        app({"SERVER_NAME":"127.0.0.1",
-             "SERVER_PORT":"8080",
-             "REQUEST_METHOD":"GET",
+        app({"REQUEST_METHOD":"GET",
              "PATH_INFO":"/"}, r.start_response)
         assert r.status.startswith("200")
 
