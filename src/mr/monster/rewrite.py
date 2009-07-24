@@ -41,6 +41,7 @@ class RewriteMiddleware(object):
     
         if "SCRIPT_NAME" in environ:
             options['PATH_INFO'] = environ['SCRIPT_NAME']
+            environ['SCRIPT_NAME'] = ''
         else:
             options['PATH_INFO'] = ''
         
