@@ -1,0 +1,17 @@
+#Set up a http server on the port defined in buildout.cfg 
+[server:main]
+use = egg:PasteScript#wsgiutils
+host = 127.0.0.1
+port = ${wsgi-conf:port}
+
+[pipeline:main]
+pipeline =
+    myfilter
+	app
+
+[filter:myfilter]
+use = egg:mr.monster#rewrite
+
+[app:app]
+use = egg:example#entrypoint
+
