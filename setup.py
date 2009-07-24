@@ -25,8 +25,7 @@ setup(name='mr.monster',
       zip_safe=False,
       install_requires=[
           'setuptools',
-          'WSGIUtils',
-          # -*- Extra requirements: -*-
+          'WebOb',
       ],
       entry_points="""
       # -*- Entry points: -*-
