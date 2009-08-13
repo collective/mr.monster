@@ -4,8 +4,6 @@ def RewriteFactory(global_config, **local_conf):
     if "host" in local_conf:
         if "port" not in local_conf:
             raise AttributeError("You must also supply a port")
-    elif "port" in local_conf:
-        raise AttributeError("You must also supply a host")
     
     def factory(app):
         return RewriteMiddleware(app, **local_conf)
@@ -35,8 +33,10 @@ class RewriteMiddleware(object):
                    "outpath":"/_vh_".join(self.externalpath)}
         
         if self.autodetect:
-            options['host'] = environ['SERVER_NAME']
-            options['port'] = environ['SERVER_PORT']
+            host = environ.get('HTTP_HOST',environ['SERVER_NAME'])
+            options['host'] = host
+            if options['port'] is None:
+                options['port'] = environ['SERVER_PORT']
         
     
         if "SCRIPT_NAME" in environ:
