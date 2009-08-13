@@ -1,7 +1,12 @@
 Release history
 ---------------
 
-2009-07-24
-##########
+Unreleased (1.1)
+################
+
+- Prefer HTTP_HOST to SERVER_NAME so HTTP/1.1 clients work more reliably. (Alan Hoey)
+
+2009-07-24 (1.0)
+################
 
 - Initial release (Matthew Wilkes)
