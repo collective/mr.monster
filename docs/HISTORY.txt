@@ -1,7 +1,11 @@
 Release history
 ---------------
 
-Unreleased (1.1)
+Unreleased (1.2)
+################
+
+
+2009-08-13 (1.1)
 ################
 
 - Make the case where no local config is supplied autodetect, not pass-through
