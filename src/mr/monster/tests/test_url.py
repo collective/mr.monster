@@ -17,16 +17,18 @@ class response(object):
 
 class test_urls(unittest.TestCase):
     
-    def test_passthrough_if_no_options(self):
+    def test_autodetect_if_no_options(self):
         factory = RewriteFactory({})
         r = response()
-        app = factory(PathAssertionEndpoint("/", self))
-        app({"REQUEST_METHOD":"GET",
+        app = factory(PathAssertionEndpoint("/VirtualHostBase/http/127.0.0.1:8080/VirtualHostRoot/", self))
+        app({"SERVER_NAME":"127.0.0.1",
+             "SERVER_PORT":"8080",
+             "REQUEST_METHOD":"GET",
              "PATH_INFO":"/"}, r.start_response)
         assert r.status.startswith("200")
         
     def test_fail_if_host_provided_but_not_port(self):
-        self.assertRaises(AttributeError, RewriteFactory, {}, host="www.example.com")
+        self.assertRaises(AttributeError, RewriteFactory, object(), host="www.example.com")
 
     def test_vhm_on_host_and_port(self):
         factory = RewriteFactory({}, host="www.example.com", port="80")
@@ -37,7 +39,7 @@ class test_urls(unittest.TestCase):
         assert r.status.startswith("200")
 
     def test_fail_if_port_provided_but_not_host(self):
-        self.assertRaises(AttributeError, RewriteFactory, {}, port="80")
+        self.assertRaises(AttributeError, RewriteFactory, object(), port="80")
     
     def test_vhm_host_autodetect(self):
         factory = RewriteFactory({}, autodetect="true")

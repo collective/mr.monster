@@ -10,19 +10,25 @@ Mr Monster is a WSGI middleware designed to make it easy to locally test
 pipelines that will eventually be served behind apache with a rewrite rule in
 place.
 
-The configuration is very simple, the easiest case being::
+The configuration is very simple, a common case being::
 
     [filter:monster]
     use = egg:mr.monster#rewrite
-    autodetect = true
+    host = www.example.com
+    port = 80
 
 which simply adds the correct VirtualHostBase/Root declarations.
+
+If no configuration options are supplied the inbound request will be
+introspected. To avoid this, set an explicit host and port. For users wanting to
+use autodetection the ``egg:mr.monster#rewrite`` line can be added directly to a
+pipeline.
 
 Options
 -------
 
 :autodetect:
-    Pick a host and port from the inbound request
+    Pick a host and port from the inbound request.
 
 :host:
     Set the canonical hostname to pass to Zope. If used you must provide a port.
