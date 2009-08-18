@@ -1,3 +1,4 @@
+import re
 from webob import Request, Response
 
 def RewriteFactory(global_config, **local_conf):
@@ -15,6 +16,8 @@ def RewriteFactory(global_config, **local_conf):
     return factory
 
 _marker = object()
+
+hostre = re.compile("(.*):(\d+)")
 
 class RewriteMiddleware(object):
     """An endpoint"""
@@ -44,11 +47,24 @@ class RewriteMiddleware(object):
                    "outpath":"/_vh_".join(self.externalpath)}
         
         if self.autodetect:
-            print environ
-            host = environ.get('HTTP_HOST',environ['SERVER_NAME'])
-            options['host'] = host
-            if options['port'] is None:
-                options['port'] = environ['SERVER_PORT']
+            host = environ.get('HTTP_HOST', None)
+            if host is not None:
+                # Using HTTP 1.1
+                parsed = re.findall(host)
+                if parsed:
+                    options['host'] = parsed[0]
+                    if options['port'] is None:
+                        options['port'] = parsed[1]
+                else:
+                    options['host'] = host
+                    if options['port'] is None:
+                        options['port'] = '80'
+            else:
+                # HTTP 1.0 or 0.9
+                host = environ['SERVER_NAME']
+                options['host'] = host
+                if options['port'] is None:
+                    options['port'] = environ['SERVER_PORT']
         
     
         if "SCRIPT_NAME" in environ:

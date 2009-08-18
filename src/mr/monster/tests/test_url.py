@@ -51,6 +51,29 @@ class test_urls(unittest.TestCase):
              "PATH_INFO":"/"}, r.start_response)
         assert r.status.startswith("200")
 
+    def test_vhm_host_autodetect_http1_1_no_port(self):
+        factory = RewriteFactory({}, autodetect="true")
+        r = response()
+        app = factory(PathAssertionEndpoint("/VirtualHostBase/http/www.example.com:80/VirtualHostRoot/", self))
+        app({"HTTP_HOST":"www.example.com",
+             "SERVER_NAME":"127.0.0.1",
+             "SERVER_PORT":"8080",
+             "REQUEST_METHOD":"GET",
+             "PATH_INFO":"/"}, r.start_response)
+        assert r.status.startswith("200")
+
+    def test_vhm_host_autodetect_http1_1_explicit_port(self):
+        factory = RewriteFactory({}, autodetect="true")
+        r = response()
+        app = factory(PathAssertionEndpoint("/VirtualHostBase/http/www.example.com:8080/VirtualHostRoot/", self))
+        app({"HTTP_HOST":"www.example.com:8080",
+             "SERVER_NAME":"127.0.0.1",
+             "SERVER_PORT":"8080",
+             "REQUEST_METHOD":"GET",
+             "PATH_INFO":"/"}, r.start_response)
+        assert r.status.startswith("200")
+
+
     def test_folder_on_zope_side(self):
         factory = RewriteFactory({}, host="www.example.com", port="80", internalpath="/foo")
         r = response()
