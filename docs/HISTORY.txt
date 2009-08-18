@@ -1,6 +1,10 @@
 Release history
 ---------------
 
+Unreleased (1.3)
+################
+
+
 2009-08-18 (1.2)
 ################
 - Fix HTTP/1.1 autodetect in the case that the client sends a host:port for the Host header. (Matthew Wilkes)
