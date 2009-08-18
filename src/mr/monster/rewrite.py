@@ -50,8 +50,9 @@ class RewriteMiddleware(object):
             host = environ.get('HTTP_HOST', None)
             if host is not None:
                 # Using HTTP 1.1
-                parsed = re.findall(host)
+                parsed = hostre.search(host)
                 if parsed:
+                    parsed = parsed.groups()
                     options['host'] = parsed[0]
                     if options['port'] is None:
                         options['port'] = parsed[1]
