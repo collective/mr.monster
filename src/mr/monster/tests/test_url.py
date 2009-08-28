@@ -77,9 +77,9 @@ class test_urls(unittest.TestCase):
     def test_double_slash(self):
         factory = RewriteFactory({}, host="www.example.com", port="80", internalpath="/foo",externalpath="/supersite/")
         r = response()
-        app = factory(PathAssertionEndpoint("/VirtualHostBase/http/www.example.com:80/foo/VirtualHostRoot/_vh_supersite/", self))
+        app = factory(PathAssertionEndpoint("/VirtualHostBase/http/www.example.com:80/foo/VirtualHostRoot/_vh_supersite", self))
         app({"REQUEST_METHOD":"GET",
-             "PATH_INFO":"/"}, r.start_response)
+             "PATH_INFO":"/supersite"}, r.start_response)
         assert r.status.startswith("200")
 
 
@@ -102,9 +102,9 @@ class test_urls(unittest.TestCase):
     def test_folder_on_client_side(self):
         factory = RewriteFactory({}, host="www.example.com", port="80", externalpath="/bar")
         r = response()
-        app = factory(PathAssertionEndpoint("/VirtualHostBase/http/www.example.com:80/VirtualHostRoot/_vh_bar/", self))
+        app = factory(PathAssertionEndpoint("/VirtualHostBase/http/www.example.com:80/VirtualHostRoot/_vh_bar", self))
         app({"REQUEST_METHOD":"GET",
-             "PATH_INFO":"/"}, r.start_response)
+             "PATH_INFO":"/bar"}, r.start_response)
         assert r.status.startswith("200")
 
     def test_accessing_resource(self):

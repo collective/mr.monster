@@ -79,7 +79,11 @@ class RewriteMiddleware(object):
             options['PATH_INFO'] = ''
         
         options['PATH_INFO'] += environ['PATH_INFO']
-
+        
+        op = '/'.join(self.externalpath)
+        if options['PATH_INFO'].startswith(op):
+            pl = len(op)
+            options['PATH_INFO'] = options['PATH_INFO'][pl:]
         
         format = "/VirtualHostBase/http/"   \
                  "%(host)s:%(port)s"        \
