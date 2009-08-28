@@ -32,8 +32,8 @@ class RewriteMiddleware(object):
         self.internalpath = internalpath.split("/")
 
         # Support special case for root external path.
-        if externalpath == '/':
-            externalpath = ''        
+        if externalpath.endswith('/'):
+            externalpath = externalpath[:-1]
         self.externalpath = externalpath.split("/")
         
         if autodetect is _marker and self.host is None and self.port is None:
