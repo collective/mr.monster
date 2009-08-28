@@ -74,6 +74,14 @@ class test_urls(unittest.TestCase):
         assert r.status.startswith("200")
 
 
+    def test_root_exception(self):
+        factory = RewriteFactory({}, host="www.example.com", port="80", internalpath="/foo",externalpath="/")
+        r = response()
+        app = factory(PathAssertionEndpoint("/VirtualHostBase/http/www.example.com:80/foo/VirtualHostRoot/", self))
+        app({"REQUEST_METHOD":"GET",
+             "PATH_INFO":"/"}, r.start_response)
+        assert r.status.startswith("200")
+
     def test_folder_on_zope_side(self):
         factory = RewriteFactory({}, host="www.example.com", port="80", internalpath="/foo")
         r = response()
