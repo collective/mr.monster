@@ -23,3 +23,12 @@ class test_set_scriptname_middleware(unittest.TestCase):
              "SCRIPT_NAME":"",
              "REQUEST_METHOD":"GET",}, r.start_response)
         self.assertEqual(r.status, "200 OK")
+
+    def test_no_doubling_of_slashes(self):
+        factory = DropFactory({}, SCRIPT_NAME="/")
+        r = response()
+        app = factory(PathAssertionEndpoint("/", SCRIPT_NAME=""))
+        app({"PATH_INFO":"/",
+             "SCRIPT_NAME":"/plone",
+             "REQUEST_METHOD":"GET",}, r.start_response)
+        self.assertEqual(r.status, "200 OK")

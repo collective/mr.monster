@@ -4,6 +4,9 @@ Release history
 Unreleased (1.4)
 ################
 
+- Make the empty string the canonical representation of SCRIPT_NAME for the reroot middleware
+  (Matthew Wilkes)
+
 - Add a secondary middleware for setting the SCRIPT_NAME
   (Matthew Wilkes)
 

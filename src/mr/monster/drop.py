@@ -18,6 +18,9 @@ class DropMiddleware(object):
         if self.SCRIPT_NAME is not None:
             environ['SCRIPT_NAME'] = self.SCRIPT_NAME
         
+        if environ['SCRIPT_NAME'] == '/':
+            environ['SCRIPT_NAME'] = ''
+        
         request = Request(environ)
         response = request.get_response(self.app)
         return response(environ, start_response)
