@@ -25,7 +25,7 @@ setup(name='mr.monster',
       zip_safe=False,
       install_requires=[
           'setuptools',
-          'WebOb==0.9.6.1',
+          'WebOb',
       ],
       entry_points="""
       # -*- Entry points: -*-
