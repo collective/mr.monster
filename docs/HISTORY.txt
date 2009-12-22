@@ -4,6 +4,12 @@ Release history
 Unreleased (1.4)
 ################
 
+- Add a secondary middleware for setting the SCRIPT_NAME
+  (Matthew Wilkes)
+
+- Refactor the assertion endpoint in the tests to be more like a normal WSGI
+  app
+  (Matthew Wilkes)
 
 2009-08-30 (1.3)
 ################
