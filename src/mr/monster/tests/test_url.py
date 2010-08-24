@@ -11,8 +11,8 @@ def PathAssertionEndpoint(PATH_INFO, SCRIPT_NAME=None):
         val = val and environ['PATH_INFO'] == PATH_INFO
         
         if not val:
-            logging.error("Expected SCRIPT_NAME %s - got %s" % (SCRIPT_NAME, environ.get('SCRIPT_NAME',"** Missing ***")))
-            logging.error("Expected PATH_INFO %s - got %s" % (PATH_INFO, environ.get('PATH_INFO',"** Missing **")))
+            logging.error("Expected SCRIPT_NAME %s - got %s" % (SCRIPT_NAME, environ.get('SCRIPT_NAME')))
+            logging.error("Expected PATH_INFO %s - got %s" % (PATH_INFO, environ.get('PATH_INFO')))
         
         
         if val:
