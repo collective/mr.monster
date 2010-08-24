@@ -1,8 +1,10 @@
 Release history
 ---------------
 
-Unreleased (1.4)
+2010-08-24 (1.4)
 ################
+
+- Add support for overriding URI scheme (Alan Hoey)
 
 - Make the empty string the canonical representation of SCRIPT_NAME for the reroot middleware
   (Matthew Wilkes)
