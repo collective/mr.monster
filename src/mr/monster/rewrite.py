@@ -24,17 +24,24 @@ class RewriteMiddleware(object):
     
     def __init__(self, app, host=None, 
                             port=None, 
+                            scheme=None,
                             internalpath='', 
                             externalpath='', 
                             autodetect=_marker):
         self.host = host
         self.port = port
-        self.internalpath = internalpath.split("/")
+        self.scheme = scheme
+
 
         # Support special case for root external path.
         if externalpath.endswith('/'):
             externalpath = externalpath[:-1]
         self.externalpath = externalpath.split("/")
+
+        # Ignore trailing slash on internalpath
+        if internalpath.endswith('/'):
+            internalpath = internalpath[:-1]
+        self.internalpath = internalpath.split("/")
         
         if autodetect is _marker and self.host is None and self.port is None:
             self.autodetect = True
@@ -45,8 +52,15 @@ class RewriteMiddleware(object):
     
     def __call__(self, environ, start_response):
         
+        scheme = self.scheme
+        if scheme is None:
+            # wsgi.url_scheme appears to be the most standard
+            # method of getting the scheme.
+            scheme = environ.get("wsgi.url_scheme","http")
+        
         options = {"host": self.host, 
                    "port": self.port, 
+                   "scheme": scheme,
                    "inpath":"/".join(self.internalpath),
                    "outpath":"/_vh_".join(self.externalpath)}
         
@@ -85,7 +99,7 @@ class RewriteMiddleware(object):
             pl = len(op)
             options['PATH_INFO'] = options['PATH_INFO'][pl:]
         
-        format = "/VirtualHostBase/http/"   \
+        format = "/VirtualHostBase/%(scheme)s/"   \
                  "%(host)s:%(port)s"        \
                  "%(inpath)s"              \
                  "/VirtualHostRoot"         \
