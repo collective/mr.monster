@@ -11,8 +11,8 @@ def PathAssertionEndpoint(PATH_INFO, SCRIPT_NAME=None):
         val = val and environ['PATH_INFO'] == PATH_INFO
         
         if not val:
-            logging.error("Expected SCRIPT_NAME %s - got %s" % (SCRIPT_NAME, environ['SCRIPT_NAME']))
-            logging.error("Expected PATH_INFO %s - got %s" % (PATH_INFO, environ['PATH_INFO']))
+            logging.error("Expected SCRIPT_NAME %s - got %s" % (SCRIPT_NAME, environ.get('SCRIPT_NAME')))
+            logging.error("Expected PATH_INFO %s - got %s" % (PATH_INFO, environ.get('PATH_INFO')))
         
         
         if val:
@@ -134,4 +134,28 @@ class test_urls(unittest.TestCase):
         app({"REQUEST_METHOD":"GET",
              "SCRIPT_NAME":"/isay",
              "PATH_INFO":"/my/thing/is/cool"}, r.start_response)
+        assert r.status.startswith("200")
+
+    def test_internalpath_at_root(self):
+        factory = RewriteFactory({},host="www.example.com",port="80",internalpath="/",externalpath="/")
+        r = response()
+        app = factory(PathAssertionEndpoint("/VirtualHostBase/http/www.example.com:80/VirtualHostRoot/"))
+        app({"REQUEST_METHOD":"GET",
+             "PATH_INFO":"/",},r.start_response)
+        assert r.status.startswith("200")
+    
+    def test_internalpath_trailing_slash(self):
+        factory = RewriteFactory({},host="www.example.com",port="80",internalpath="/bees/",externalpath="/")
+        r = response()
+        app = factory(PathAssertionEndpoint("/VirtualHostBase/http/www.example.com:80/bees/VirtualHostRoot/"))
+        app({"REQUEST_METHOD":"GET",
+             "PATH_INFO":"/",},r.start_response)
+        assert r.status.startswith("200")
+
+    def test_scheme_support(self):
+        factory = RewriteFactory({},host="www.example.com",port="80",scheme="https",internalpath="/",externalpath="/")
+        r = response()
+        app = factory(PathAssertionEndpoint("/VirtualHostBase/https/www.example.com:80/VirtualHostRoot/"))
+        app({"REQUEST_METHOD":"GET",
+             "PATH_INFO":"/",},r.start_response)
         assert r.status.startswith("200")

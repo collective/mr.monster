@@ -41,3 +41,6 @@ Options
 
 :externalpath:
     A path in the form `/bar/baz` to filter from a request using _vh_bar syntax.
+
+:scheme:
+    The URI scheme to use in the virtual host, by default this is detected automatically.
