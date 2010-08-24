@@ -136,6 +136,14 @@ class test_urls(unittest.TestCase):
              "PATH_INFO":"/my/thing/is/cool"}, r.start_response)
         assert r.status.startswith("200")
 
+    def test_internalpath_at_root(self):
+        factory = RewriteFactory({},host="www.example.com",port="80",internalpath="/",externalpath="/")
+        r = response()
+        app = factory(PathAssertionEndpoint("/VirtualHostBase/http/www.example.com:80/VirtualHostRoot/"))
+        app({"REQUEST_METHOD":"GET",
+             "PATH_INFO":"/",},r.start_response)
+        assert r.status.startswith("200")        
+
     def test_scheme_support(self):
         factory = RewriteFactory({},host="www.example.com",port="80",scheme="https",internalpath="/",externalpath="/")
         r = response()
