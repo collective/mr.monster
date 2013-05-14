@@ -69,7 +69,7 @@ class test_urls(unittest.TestCase):
         environ = {"SERVER_NAME":"127.0.0.1",
                    "SERVER_PORT":"8080",
                    "REQUEST_METHOD":"GET",
-                   "PATH_INFO":"/mysite/cheese"}
+                   "PATH_INFO":"/cheese"}
         self._catch_unexpected(stack,environ)
 
     def test_vhm_on_host_and_port(self):
@@ -101,14 +101,14 @@ class test_urls(unittest.TestCase):
         stack = self._make_assertion_stack("/VirtualHostBase/http/www.example.com:80/foo/VirtualHostRoot/_vh_supersite/",
                                            host="www.example.com",port="80",internal="/foo",external="/supersite/")
         environ = {"REQUEST_METHOD":"GET",
-                   "PATH_INFO":"/supersite"}
+                   "PATH_INFO":"/"}
         self._catch_unexpected(stack,environ)
 
     def test_trailing_slash_internal(self):
-        stack = self._make_assertion_stack("/VirtualHostBase/http/www.example.com:80/foo/VirtualHostRoot/_vh_supersite",
+        stack = self._make_assertion_stack("/VirtualHostBase/http/www.example.com:80/foo/VirtualHostRoot/_vh_supersite/",
                                            host="www.example.com",port="80",internal="/foo/",external="/supersite")
         environ = {"REQUEST_METHOD":"GET",
-                   "PATH_INFO":"/supersite"}
+                   "PATH_INFO":"/"}
         self._catch_unexpected(stack,environ)
 
     def test_single_slash_external(self):
@@ -120,7 +120,7 @@ class test_urls(unittest.TestCase):
         self._catch_unexpected(stack,environ)
     
     def test_single_slash_internal(self):
-        stack = self._make_assertion_stack("/VirtualHostBase/http/www.example.com:80/VirtualHostRoot/_vh_bar",
+        stack = self._make_assertion_stack("/VirtualHostBase/http/www.example.com:80/VirtualHostRoot/_vh_bar/",
                                            host="www.example.com",port="80",internal="/",external="/bar")
 
         environ = {"REQUEST_METHOD":"GET",
@@ -135,7 +135,7 @@ class test_urls(unittest.TestCase):
         self._catch_unexpected(stack,environ)
 
     def test_no_internal(self):
-        stack = self._make_assertion_stack("/VirtualHostBase/http/www.example.com:80/VirtualHostRoot/_vh_bar",
+        stack = self._make_assertion_stack("/VirtualHostBase/http/www.example.com:80/VirtualHostRoot/_vh_bar/",
                                            host="www.example.com",port="80",external="/bar")
         environ = {"REQUEST_METHOD":"GET",
                    "PATH_INFO":"/"}
@@ -164,7 +164,7 @@ class test_urls(unittest.TestCase):
         self._catch_unexpected(stack,environ)
     
     def test_multipart_external(self):
-        stack = self._make_assertion_stack("/VirtualHostBase/https/www.example.com:80/VirtualHostRoot/_vh_foo/_vh_bar",
+        stack = self._make_assertion_stack("/VirtualHostBase/https/www.example.com:80/VirtualHostRoot/_vh_foo/_vh_bar/",
                                            host="www.example.com",port="80",scheme="https",external="/foo/bar")
         environ = {"REQUEST_METHOD":"GET",
                    "PATH_INFO":"/"}
