@@ -162,3 +162,10 @@ class test_urls(unittest.TestCase):
         environ = {"REQUEST_METHOD":"GET",
                    "PATH_INFO":"/hello"}
         self._catch_unexpected(stack,environ)
+    
+    def test_multipart_external(self):
+        stack = self._make_assertion_stack("/VirtualHostBase/https/www.example.com:80/VirtualHostRoot/_vh_foo/_vh_bar",
+                                           host="www.example.com",port="80",scheme="https",external="/foo/bar")
+        environ = {"REQUEST_METHOD":"GET",
+                   "PATH_INFO":"/"}
+        self._catch_unexpected(stack,environ)
