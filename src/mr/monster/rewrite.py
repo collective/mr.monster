@@ -39,9 +39,6 @@ class RewriteMiddleware(object):
         if internal:
             internal = "/%s" % internal
 
-        # We use this to drop the correct number of characters off the inbound urls
-        self.external = len(external)
-
         # Clean up the specified external path
         clean_external = []
         for element in external.split('/'):
@@ -49,7 +46,11 @@ class RewriteMiddleware(object):
                 element = "_vh_%s" % element
             clean_external.append(element)
         external = "/".join(clean_external)
-
+        
+        # Externals aren't allowed to end with a slash as the path
+        # is guaranteed to start with one (or be empty)
+        external = external.rstrip('/')
+        
         # Build our overrides, to precompute the pattern
         overrides = {'scheme':scheme or '%(scheme)s',
                      'host':host or '%(host)s',
@@ -79,11 +80,6 @@ class RewriteMiddleware(object):
         
         # Rebuild the path
         path = "%s%s" % (environ.get('SCRIPT_NAME',''),environ.get('PATH_INFO',''))
-
-        # Crop the path elements which are already included as part of the external path
-        # Warning: This will behave strangely if the inbound path did not start with the
-        #          externals.  I can't think of a sane reason why you'd want to do that. 
-        path = path[self.external:]
 
         options = {'scheme':scheme,
                    'host':host,
