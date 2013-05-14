@@ -30,6 +30,5 @@ setup(name='mr.monster',
       # -*- Entry points: -*-
 [paste.filter_factory]
 rewrite = mr.monster.rewrite:RewriteFactory
-reroot = mr.monster.drop:DropFactory
       """,
       )
