@@ -46,7 +46,6 @@ class test_urls(unittest.TestCase):
             self.fail(message)
 
 
-
     def test_autodetect_if_no_options(self):
         stack = self._make_assertion_stack("/VirtualHostBase/http/127.0.0.1:8080/VirtualHostRoot/")
         environ = {"SERVER_NAME":"127.0.0.1",
@@ -97,7 +96,6 @@ class test_urls(unittest.TestCase):
                    "REQUEST_METHOD":"GET",
                    "PATH_INFO":"/"}
         self._catch_unexpected(stack,environ)
-
 
     def test_trailing_slash_external(self):
         stack = self._make_assertion_stack("/VirtualHostBase/http/www.example.com:80/foo/VirtualHostRoot/_vh_supersite/",
