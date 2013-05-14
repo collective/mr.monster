@@ -27,8 +27,8 @@ pipeline.
 Options
 -------
 
-:autodetect:
-    Pick a host and port from the inbound request.
+:scheme:
+    The URI scheme to use in the virtual host, by default this is detected automatically.
 
 :host:
     Set the canonical hostname to pass to Zope. If used you must provide a port.
@@ -36,11 +36,9 @@ Options
 :port:
     Set the canonical port.  If used you must provide a host.
 
-:internalpath:
+:internal:
     A path in the form `/foo/site` that is the base of your application in Zope.
 
-:externalpath:
+:external:
     A path in the form `/bar/baz` to filter from a request using _vh_bar syntax.
 
-:scheme:
-    The URI scheme to use in the virtual host, by default this is detected automatically.
