@@ -1,5 +1,5 @@
 import re
-from webob import Request, Response
+from webob import Request
 
 def RewriteFactory(global_config, **local_conf):
     if "host" in local_conf:
