@@ -19,8 +19,9 @@ _marker = object()
 
 hostre = re.compile("(.*):(\d+)")
 
+
 class RewriteMiddleware(object):
-    """An endpoint"""
+    """ Rewriting middleware which allows adding VHM path elements """
     
     def __init__(self, app, host=None, 
                             port=None, 
