@@ -89,7 +89,7 @@ class test_urls(unittest.TestCase):
     def test_double_slash(self):
         factory = RewriteFactory({}, host="www.example.com", port="80", internalpath="/foo",externalpath="/supersite/")
         r = response()
-        app = factory(PathAssertionEndpoint("/VirtualHostBase/http/www.example.com:80/foo/VirtualHostRoot/_vh_supersite"))
+        app = factory(PathAssertionEndpoint("/VirtualHostBase/http/www.example.com:80/foo/VirtualHostRoot/_vh_supersite/"))
         app({"REQUEST_METHOD":"GET",
              "PATH_INFO":"/supersite"}, r.start_response)
         assert r.status.startswith("200")
