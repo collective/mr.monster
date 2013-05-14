@@ -1,24 +1,26 @@
-import re
-from webob import Request
 
 def RewriteFactory(global_config, **local_conf):
-    if "host" in local_conf:
-        if "port" not in local_conf:
-            raise AttributeError("You must also supply a port")
 
-    if "port" in local_conf:
-        if "host" not in local_conf:
-            raise AttributeError("You must also supply a host")
+    if 'port' in local_conf and not 'host' in local_conf:
+        raise AttributeError("Host must be specified to use port")
 
+    if 'host' in local_conf and 'port' not in local_conf:
+        raise AttributeError("Port must be specified to use host")
+
+
+    # BBB: Removed the 'path' from internal and external
+    for old in ['internalpath','externalpath']:
+        if old in local_conf:
+            local_conf[old[:-4]] = local_conf[old]
+            del local_conf[old]
+
+    # Autodetect is implied now (we fill in anything you don't specify)
+    if 'autodetect' in local_conf:
+        del local_conf['autodetect']
     
     def factory(app):
         return RewriteMiddleware(app, **local_conf)
     return factory
-
-_marker = object()
-
-hostre = re.compile("(.*):(\d+)")
-
 
 class RewriteMiddleware(object):
     """ Rewriting middleware which allows adding VHM path elements """
@@ -26,90 +28,75 @@ class RewriteMiddleware(object):
     def __init__(self, app, host=None, 
                             port=None, 
                             scheme=None,
-                            internalpath='', 
-                            externalpath='', 
-                            autodetect=_marker):
-        self.host = host
-        self.port = port
-        self.scheme = scheme
-
-
-        # Support special case for root external path.
-        if externalpath.endswith('/'):
-            externalpath = externalpath[:-1]
-        self.externalpath = externalpath.split("/")
-
-        # Ignore trailing slash on internalpath
-        if internalpath.endswith('/'):
-            internalpath = internalpath[:-1]
-        self.internalpath = internalpath.split("/")
+                            internal='', 
+                            external=''):
         
-        if autodetect is _marker and self.host is None and self.port is None:
-            self.autodetect = True
-        else:
-            self.autodetect = str(autodetect).lower() == "true"
-            
+        # This is the WSGI app we wrap
         self.app = app
-    
+
+        # Clean up the specified internal path
+        internal = internal.strip('/')
+        if internal:
+            internal = "/%s" % internal
+
+        # We use this to drop the correct number of characters off the inbound urls
+        self.external = len(external)
+
+        # Clean up the specified external path
+        clean_external = []
+        for element in external.split('/'):
+            if element:
+                element = "_vh_%s" % element
+            clean_external.append(element)
+        external = "/".join(clean_external)
+
+        # Build our overrides, to precompute the pattern
+        overrides = {'scheme':scheme or '%(scheme)s',
+                     'host':host or '%(host)s',
+                     'port':port or '%(port)s',
+                     'internal':internal,
+                     'external':external}
+
+        # Build the pattern
+        self.pattern = "/VirtualHostBase/%(scheme)s/%(host)s:%(port)s%(internal)s/VirtualHostRoot%(external)s%%(path)s" % overrides
+
+
     def __call__(self, environ, start_response):
         
-        scheme = self.scheme
-        if scheme is None:
-            # wsgi.url_scheme appears to be the most standard
-            # method of getting the scheme.
-            scheme = environ.get("wsgi.url_scheme","http")
+        # Look up the scheme
+        scheme = environ.get('wsgi_url_scheme','http')
+
+        # Lookup host and port
+        host = environ.get('HTTP_HOST','')
+        port = "80"
+        if ':' in host:
+            host,port = host.rsplit(':',1)
+
+        # Fallback host and port for non HTTP/1.1 clients
+        if not host:
+            host = environ.get('SERVER_NAME')
+            port = environ.get('SERVER_PORT',"80")
         
-        options = {"host": self.host, 
-                   "port": self.port, 
-                   "scheme": scheme,
-                   "inpath":"/".join(self.internalpath),
-                   "outpath":"/_vh_".join(self.externalpath)}
+        # Rebuild the path
+        path = "%s%s" % (environ.get('SCRIPT_NAME',''),environ.get('PATH_INFO',''))
+
+        # Crop the path elements which are already included as part of the external path
+        # Warning: This will behave strangely if the inbound path did not start with the
+        #          externals.  I can't think of a sane reason why you'd want to do that. 
+        path = path[self.external:]
+
+        options = {'scheme':scheme,
+                   'host':host,
+                   'port':port,
+                   'path':path}
+
+        # Clobber SCRIPT_NAME to prevent any downstream 
+        # middlewares from incorrectly regenerating URLs.
+        environ['SCRIPT_NAME'] = None
         
-        if self.autodetect:
-            host = environ.get('HTTP_HOST', None)
-            if host is not None:
-                # Using HTTP 1.1
-                parsed = hostre.search(host)
-                if parsed:
-                    parsed = parsed.groups()
-                    options['host'] = parsed[0]
-                    if options['port'] is None:
-                        options['port'] = parsed[1]
-                else:
-                    options['host'] = host
-                    if options['port'] is None:
-                        options['port'] = '80'
-            else:
-                # HTTP 1.0 or 0.9
-                host = environ['SERVER_NAME']
-                options['host'] = host
-                if options['port'] is None:
-                    options['port'] = environ['SERVER_PORT']
+        # Overwrite PATH_INFO with our new url
+        environ['PATH_INFO'] = self.pattern % options
         
-    
-        if "SCRIPT_NAME" in environ:
-            options['PATH_INFO'] = environ['SCRIPT_NAME']
-            environ['SCRIPT_NAME'] = ''
-        else:
-            options['PATH_INFO'] = ''
-        
-        options['PATH_INFO'] += environ['PATH_INFO']
-        
-        op = '/'.join(self.externalpath)
-        if options['PATH_INFO'].startswith(op):
-            pl = len(op)
-            options['PATH_INFO'] = options['PATH_INFO'][pl:]
-        
-        format = "/VirtualHostBase/%(scheme)s/"   \
-                 "%(host)s:%(port)s"        \
-                 "%(inpath)s"              \
-                 "/VirtualHostRoot"         \
-                 "%(outpath)s"             \
-                 "%(PATH_INFO)s"    % options
-        
-        if options['host'] is not None:
-            environ['PATH_INFO'] = format
-        
-        request = Request(environ)
-        response = request.get_response(self.app)
-        return response(environ, start_response)
+        # And we're done, don't try and wrap the response
+        # so any iterables are appropriately passed through
+        return self.app(environ,start_response)
