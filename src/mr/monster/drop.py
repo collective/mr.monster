@@ -1,5 +1,4 @@
 import re
-from webob import Request, Response
 
 def DropFactory(global_config, **local_conf):
     def factory(app):
@@ -21,6 +20,4 @@ class DropMiddleware(object):
         if environ['SCRIPT_NAME'] == '/':
             environ['SCRIPT_NAME'] = ''
         
-        request = Request(environ)
-        response = request.get_response(self.app)
-        return response(environ, start_response)
+        return self.app(environ,start_response)
