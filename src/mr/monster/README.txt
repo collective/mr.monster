@@ -46,3 +46,7 @@ Options
     A path in the form `/foo/bar` which will be dropped from the beginning of all
     request paths.  Use in conjunction with ``external`` when there is no upstream proxy
     or it doesn't remove the _vh_ elements automatically.
+
+:passthrough:
+    Set to `true` to cause this middleware to ignore requests which already have a vhm
+    configuration, such as from an upstream proxy.
