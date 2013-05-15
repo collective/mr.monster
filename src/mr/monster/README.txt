@@ -48,5 +48,7 @@ Options
     or it doesn't remove the _vh_ elements automatically.
 
 :passthrough:
-    Set to `true` to cause this middleware to ignore requests which already have a vhm
-    configuration, such as from an upstream proxy.
+    If `true` this will cause mr.monster to ignore requests which already have virtualhost
+    declarations.  This is useful when the same configuration is used in development and
+    production, but the production proxy (such as Apache) already adds the declarations. Off 
+    by default.
