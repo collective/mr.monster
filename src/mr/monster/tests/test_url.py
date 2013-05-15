@@ -169,3 +169,12 @@ class test_urls(unittest.TestCase):
         environ = {"REQUEST_METHOD":"GET",
                    "PATH_INFO":"/"}
         self._catch_unexpected(stack,environ)
+    
+    def test_drop(self):
+        stack = self._make_assertion_stack("/VirtualHostBase/http/www.example.com:80/site/VirtualHostRoot/_vh_supersite/cheese/mypage",
+                                           host="www.example.com",port="80",internal="/site",external="/supersite/",drop="/supersite")
+        environ = {"REQUEST_METHOD":"GET",
+                   "PATH_INFO":"/supersite/cheese/mypage"}
+        self._catch_unexpected(stack,environ)
+        
+    
