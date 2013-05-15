@@ -1,6 +1,19 @@
 Release history
 ---------------
 
+Unreleased
+##########
+
+- Major refactor of both rewrite middleware and tests (Alan Hoey)
+
+- Removed reroot middleware (Alan Hoey)
+
+- Make stripping of path elements from the passed in path info optional, via
+  `drop` parameter.
+
+- Added support for passing through existing virtualhost URLs (Alan Hoey)
+
+
 2010-08-24 (1.4)
 ################
 
