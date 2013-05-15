@@ -30,12 +30,20 @@ class RewriteMiddleware(object):
                             scheme=None,
                             internal='', 
                             external='',
-                            drop=None):
+                            drop=None,
+                            passthrough=''):
         
         # This is the WSGI app we wrap
         self.app = app
         
+        # Set the drop path
         self.drop = drop
+        
+        # Passthrough support
+        if passthrough in ['true','on','yes']:
+            self.passthrough = True
+        else:
+            self.passthrough = False
 
         # Clean up the specified internal path
         internal = internal.strip('/')
@@ -67,6 +75,15 @@ class RewriteMiddleware(object):
 
     def __call__(self, environ, start_response):
         
+        # Rebuild the path
+        path = "%s%s" % (environ.get('SCRIPT_NAME',''),environ.get('PATH_INFO',''))
+
+        # We passthrough if there is an existing VHM url in the request.  VHM URLs
+        # don't have to have both root and base, so we look for either.
+        if self.passthrough:
+            if 'VirtualHostBase' in path or 'VirtualHostRoot' in path:
+                return self.app(environ,start_response)
+        
         # Look up the scheme
         scheme = environ.get('wsgi_url_scheme','http')
 
@@ -81,8 +98,6 @@ class RewriteMiddleware(object):
             host = environ.get('SERVER_NAME')
             port = environ.get('SERVER_PORT',"80")
         
-        # Rebuild the path
-        path = "%s%s" % (environ.get('SCRIPT_NAME',''),environ.get('PATH_INFO',''))
 
         # Drop leading elements
         if self.drop is not None and path.startswith(self.drop):
