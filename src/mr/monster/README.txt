@@ -42,3 +42,7 @@ Options
 :external:
     A path in the form `/bar/baz` to filter from a request using _vh_bar syntax.
 
+:drop:
+    A path in the form `/foo/bar` which will be dropped from the beginning of all
+    request paths.  Use in conjunction with ``external`` when there is no upstream proxy
+    or it doesn't remove the _vh_ elements automatically.
