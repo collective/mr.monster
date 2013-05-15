@@ -29,10 +29,13 @@ class RewriteMiddleware(object):
                             port=None, 
                             scheme=None,
                             internal='', 
-                            external=''):
+                            external='',
+                            drop=None):
         
         # This is the WSGI app we wrap
         self.app = app
+        
+        self.drop = drop
 
         # Clean up the specified internal path
         internal = internal.strip('/')
@@ -80,6 +83,11 @@ class RewriteMiddleware(object):
         
         # Rebuild the path
         path = "%s%s" % (environ.get('SCRIPT_NAME',''),environ.get('PATH_INFO',''))
+
+        # Drop leading elements
+        if self.drop is not None and path.startswith(self.drop):
+            path = path[len(self.drop):]
+            
 
         options = {'scheme':scheme,
                    'host':host,
